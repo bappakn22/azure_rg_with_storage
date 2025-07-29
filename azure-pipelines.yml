@@ -13,11 +13,12 @@ stages:
       - job: terraform_application_install
         steps:
           - task: TerraformInstaller@1
+            displayName: terraform install execute
             inputs:
               terraformVersion: 'latest'
-      - job: terraform_init
-        steps:
+    
           - task: TerraformTask@5
+            displayName: terraform init execute
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -29,6 +30,7 @@ stages:
               backendAzureRmKey: 'azure_basic.tfstate'
 
           - task: TerraformTask@5
+            displayName: terraform code validation
             inputs:
               provider: 'azurerm'
               command: 'validate'
