@@ -18,7 +18,7 @@ stages:
               terraformVersion: 'latest'
     
           - task: TerraformTask@5
-            displayName: terraform init execute
+            displayName: "terraform init execute"
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -30,7 +30,7 @@ stages:
               backendAzureRmKey: 'azure_basic.tfstate'
 
           - task: TerraformTask@5
-            displayName: terraform code validation
+            displayName: "terraform code validation"
             inputs:
               provider: 'azurerm'
               command: 'validate'
@@ -41,12 +41,12 @@ stages:
       - job: terraform_plan_execute
         steps:
           - task: TerraformInstaller@1
-            displayName: terraform install execute
+            displayName: "terraform install execute"
             inputs:
               terraformVersion: 'latest'
     
           - task: TerraformTask@5
-            displayName: terraform init execute
+            displayName: "terraform init execute"
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -58,13 +58,43 @@ stages:
               backendAzureRmKey: 'azure_basic.tfstate'
 
           - task: TerraformTask@5
-            displayName: terraform plan 
+            displayName: "terraform plan" 
             inputs:
               provider: 'azurerm'
               command: 'plan'
               workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
               environmentServiceNameAzureRM: 'infra-azure-connection'
 
-  # - stage: terraform_security_check
-  #   jobs:
-  #     - job: terraform_code_security_check
+  - stage: terraform_security_check
+    jobs:
+      - job: terraform_code_security_check
+        steps:
+          
+          - task: PowerShell@2
+            displayName: "checkov execute"
+            inputs:
+              targetType: 'inline'
+              script: 'checkov -d $(System.DefaultWorkingDirectory) --output junitxml > securityresult.xml'
+
+          - task: PublishTestResults@2
+            displayName: "scanning report"
+            condition: always ()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'securityresult.xml'
+
+          - task: PowerShell@2
+            displayName: "tflint execute"
+            condition: always ()
+            inputs: 
+              targetType: 'inline' 
+              script: 'tflint --chdir="$(System.DefaultWorkingDirectory)" --recursive /f junit | Out-File -Encoding utf8 tflintresult.xml'
+
+          - task: PublishTestResults@2
+            displayName: "tflint report"
+            condition: always ()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'tflintresult.xml'
+
+          
