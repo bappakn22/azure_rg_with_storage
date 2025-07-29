@@ -97,4 +97,52 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'tflintresult.xml'
 
+  - stage: manual_validation
+    dependsOn: terraform_security_check
+    displayName: validation approval
+    condition: always ()
+    jobs:
+      - job: validate_by_manual
+        steps:
+        - task: ManualValidation@1
+          displayName: "validate by manual"
           
+          inputs:
+            notifyUsers: 'bappakn22@gmail.com'
+            approvers: 'bappakn22@gmail.com'
+            instructions: 'please approve'
+
+    pool: server
+
+  - stage: terraform_apply
+    displayName: "tf apply"
+    dependsOn: manual_validation
+    condition: always ()
+    jobs:
+      - job: terraformapplywillexecute
+        steps:
+          
+          - task: TerraformInstaller@1
+            displayName: "terraform install execute"
+            inputs:
+              terraformVersion: 'latest'
+    
+          - task: TerraformTask@5
+            displayName: "terraform init execute"
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
+              backendServiceArm: 'infra-azure-connection'
+              backendAzureRmResourceGroupName: 'bappa_state_rg'
+              backendAzureRmStorageAccountName: 'bappastatestorage'
+              backendAzureRmContainerName: 'statecontainer'
+              backendAzureRmKey: 'azure_basic.tfstate'
+
+          - task: TerraformTask@5
+            displayName: apply execute
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
+              environmentServiceNameAzureRM: 'infra-azure-connection'
