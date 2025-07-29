@@ -7,7 +7,7 @@ pool:
   name: infra_agentpool
 
 stages:
-  - stage: terraforminstall
+  - stage: terraform_install
     displayName: terraform app installation
     jobs:
       - job: terraform_application_install
@@ -35,3 +35,36 @@ stages:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
+
+  - stage: terraform_plan
+    jobs:
+      - job: terraform_plan_execute
+        steps:
+          - task: TerraformInstaller@1
+            displayName: terraform install execute
+            inputs:
+              terraformVersion: 'latest'
+    
+          - task: TerraformTask@5
+            displayName: terraform init execute
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
+              backendServiceArm: 'infra-azure-connection'
+              backendAzureRmResourceGroupName: 'bappa_state_rg'
+              backendAzureRmStorageAccountName: 'bappastatestorage'
+              backendAzureRmContainerName: 'statecontainer'
+              backendAzureRmKey: 'azure_basic.tfstate'
+
+          - task: TerraformTask@5
+            displayName: terraform plan 
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\environment'
+              environmentServiceNameAzureRM: 'infra-azure-connection'
+
+  # - stage: terraform_security_check
+  #   jobs:
+  #     - job: terraform_code_security_check
