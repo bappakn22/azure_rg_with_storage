@@ -88,7 +88,7 @@ stages:
             condition: always ()
             inputs: 
               targetType: 'inline' 
-              script: 'tflint --chdir="$(System.DefaultWorkingDirectory)\environment" --recursive /f junit | Out-File -Encoding utf8 tflintresult.xml'
+              script: 'tflint --chdir="$(System.DefaultWorkingDirectory)\environment" --recursive --format junit | Out-File -Encoding utf8 tflintresult.xml'
 
           - task: PublishTestResults@2
             displayName: "tflint report"
