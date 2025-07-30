@@ -78,21 +78,28 @@ stages:
 
           - task: PublishTestResults@2
             displayName: "scanning report"
-            condition: always ()
+            condition: always()
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'securityresult.xml'
 
           - task: PowerShell@2
             displayName: "tflint execute"
-            condition: always ()
+            condition: always()
             inputs: 
               targetType: 'inline' 
               script: 'tflint --chdir="$(System.DefaultWorkingDirectory)\environment" --recursive --format junit | Out-File -Encoding utf8 tflintresult.xml'
 
+          # - task: PublishTestResults@2
+          #   displayName: "tflint report"
+          #   condition: always ()
+          #   inputs:
+          #     testResultsFormat: 'JUnit'
+          #     testResultsFiles: 'tflintresult.xml'
+
           - task: PublishTestResults@2
-            displayName: "tflint report"
-            condition: always ()
+            displayName: lint_report
+            condition: always()
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'tflintresult.xml'
