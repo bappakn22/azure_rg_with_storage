@@ -1,0 +1,18 @@
+name: shiva workflow
+on:
+ push:
+   branches:
+     - main
+     - 'features/**'
+
+jobs:
+  shiva_job:
+    name: shiva job
+    runs-on: self-hosted
+    steps:
+      - name: devotee printing
+        env: 
+          MY_VAR: Hi there!!! i am Bappa!!!
+          MESSAGE: i am a devotee of shiva
+        run: |
+          "echo $env:MY_VAR $env:MESSAGE"
