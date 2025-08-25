@@ -1,0 +1,17 @@
+name: morning class 1st workflow
+on:
+  push:
+    branches:
+      - main
+      - 'features/**'
+jobs:  
+  my_first_job:
+    name: morning first job
+    runs-on: self-hosted
+    steps:
+     - name: hare krisha majaraj
+       env:
+         MY_VAR: Hi there!!! we are devops team!!!
+         MESSAGE: we are devotee of shree Krishna!!!
+       run: |
+         "echo $env:MY_VAR $env:MESSAGE"
