@@ -8,10 +8,10 @@ terraform {
 
   }
 backend "azurerm" {
-    resource_group_name = "bappa_state_rg"
-    storage_account_name = "bappastatestorage"
-    container_name = "statecontainer"
-    key = "code.tfstate"
+    resource_group_name = "bappa-remotestate-rg"
+    storage_account_name = "bappastatefiles"
+    container_name = "statecfiles"
+    key = "gittfbasic.tfstate"
 }
   
 }
